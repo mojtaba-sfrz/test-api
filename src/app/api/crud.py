@@ -6,3 +6,28 @@ from app.db import notes, database
 async def post(playload: NoteSchema):
     query = notes.insert().values(title=playload.title, description=playload.description)
     return await database.execute(query=query)
+
+async def get(id:int):
+
+    query = notes.select().where(id == notes.c.id)
+    return await database.fetch_one(query=query)
+
+async def get_all():
+    query = notes.select()
+    return await database.fetch_all(query=query)
+
+
+async def put(id:int, playload:NoteSchema):
+    query = (notes
+             .update()
+             .where(id==notes.c.id)
+             .values(title=playload.title, description=playload.description)
+             .returning(notes.c.id))
+    
+    return await database.execute(query=query)
+
+
+async def delete(id:int):
+    query = notes.delete().where(id==notes.c.id)
+
+    return await database.execute(query=query)
